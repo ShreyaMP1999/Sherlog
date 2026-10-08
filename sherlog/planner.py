@@ -24,7 +24,7 @@ def rule_plan(state: dict) -> dict:
 
 class OllamaPlanner:
     def __init__(self, model: str | None = None, endpoint: str | None = None):
-        self.model = model or os.getenv("TRACEPILOT_MODEL", "qwen3:4b")
+        self.model = model or os.getenv("SHERLOG_MODEL", "qwen3:4b")
         self.endpoint = (endpoint or os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")).rstrip("/")
 
     def __call__(self, state: dict) -> dict:

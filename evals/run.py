@@ -5,9 +5,9 @@ import json
 import statistics
 from pathlib import Path
 
-from tracepilot.agent import investigate
-from tracepilot.report import validate_report
-from tracepilot.tools import get_incident
+from sherlog.agent import investigate
+from sherlog.report import validate_report
+from sherlog.tools import get_incident
 
 
 def log_only_baseline(incident: dict) -> str:

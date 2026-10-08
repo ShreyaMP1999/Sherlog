@@ -1,0 +1,21 @@
+name: Tests and incident evaluation
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r requirements.lock
+      - run: python -m pip install --no-deps -e .
+      - run: python -m unittest discover -s tests -v
+      - run: python -m evals.run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-python-${{ matrix.python-version }}
+          path: artifacts/eval-results.json

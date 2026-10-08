@@ -8,7 +8,7 @@ from .tools import load_incidents
 
 
 def main():
-    parser = argparse.ArgumentParser(description="TracePilot incident investigator")
+    parser = argparse.ArgumentParser(description="Sherlog incident investigator")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("list", help="List synthetic demo incidents")
     run = sub.add_parser("investigate", help="Investigate an incident")
@@ -30,7 +30,7 @@ def main():
         try:
             report = investigate(args.incident, args.mode, args.budget)
         except (ValueError, RuntimeError) as exc:
-            parser.exit(2, f"TracePilot: {exc}\n")
+            parser.exit(2, f"Sherlog: {exc}\n")
         content = json.dumps(report, indent=2) if args.format == "json" else markdown(report)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)

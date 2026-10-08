@@ -3,17 +3,17 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tracepilot"
+name = "sherlog"
 version = "0.1.0"
 description = "Evidence-backed incident investigation with LangGraph"
 requires-python = ">=3.11"
 dependencies = ["langgraph>=1.0,<2"]
 
 [project.scripts]
-tracepilot = "tracepilot.cli:main"
+sherlog = "sherlog.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["tracepilot*"]
+include = ["sherlog*"]
 
 [tool.setuptools.package-data]
-tracepilot = ["data/*.json", "web/*"]
+sherlog = ["data/*.json", "web/*"]

@@ -13,7 +13,7 @@ def build_report(state: dict) -> dict:
             "citations": [], "actions": ["Collect missing evidence and involve the incident owner."],
             "summary": "The available evidence does not support a specific cause.",
             "limitations": "Synthetic snapshot; support strength is not a calibrated probability. "
-                           "Suggested actions require review; TracePilot makes no production changes."}
+                           "Suggested actions require review; Sherlog makes no production changes."}
     if not all(name in observations for name in TOOL_NAMES):
         base["summary"] = "Investigation incomplete: one or more evidence tools did not succeed."
         return base
@@ -69,7 +69,7 @@ def validate_report(report: dict) -> None:
 
 
 def markdown(report: dict) -> str:
-    lines = [f"# TracePilot: {report['incident_id']}", "", report["summary"], "",
+    lines = [f"# Sherlog: {report['incident_id']}", "", report["summary"], "",
              f"- Status: {report['status']}", f"- Cause: {report['cause']}",
              f"- Evidence support: {report['support']}", f"- Mode: {report['mode']}",
              f"- Tool calls: {report['tool_calls']}", "", "## Evidence", ""]
