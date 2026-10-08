@@ -1,0 +1,14 @@
+[
+  {"incident":"checkout-pool","cause":"db_pool_exhaustion","status":"diagnosed"},
+  {"incident":"payment-outage","cause":"upstream_outage","status":"diagnosed"},
+  {"incident":"deploy-regression","cause":"deployment_regression","status":"diagnosed"},
+  {"incident":"memory-pressure","cause":"memory_pressure","status":"diagnosed"},
+  {"incident":"healthy","cause":"healthy","status":"healthy"},
+  {"incident":"unknown","cause":"unknown","status":"inconclusive"},
+  {"incident":"pool-noise","cause":"db_pool_exhaustion","status":"diagnosed"},
+  {"incident":"stale-deploy","cause":"unknown","status":"inconclusive"},
+  {"incident":"timeout-decoy","cause":"unknown","status":"inconclusive"},
+  {"incident":"ambiguous","cause":"unknown","status":"ambiguous"},
+  {"incident":"injection","cause":"upstream_outage","status":"diagnosed"},
+  {"incident":"memory-decoy","cause":"unknown","status":"inconclusive"}
+]
