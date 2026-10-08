@@ -13,6 +13,10 @@ def load_incidents() -> list[dict]:
     return json.loads((DATA / "incidents.json").read_text())
 
 
+def load_runbooks() -> list[dict]:
+    return json.loads((DATA / "runbooks.json").read_text())
+
+
 def get_incident(incident_id: str) -> dict:
     for incident in load_incidents():
         if incident["id"] == incident_id:
@@ -49,7 +53,7 @@ class IncidentTools:
 
     def search_runbooks(self, query: str = "") -> list[dict]:
         terms = set(re.findall(r"\w+", query.lower()))
-        books = json.loads((DATA / "runbooks.json").read_text())
+        books = load_runbooks()
         ranked = [(len(terms & set(book["keywords"])), book) for book in books]
         return [book for score, book in sorted(ranked, key=lambda row: -row[0])
                 if not terms or score > 0]

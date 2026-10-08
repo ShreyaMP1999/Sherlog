@@ -1,19 +1,19 @@
-# Interface Verification
+# Workspace Verification
 
-The case-ledger redesign was exercised in the browser against the running local API.
+The multipage workspace was exercised against the running localhost API with browser controls.
 
-- Checkout investigation returns the expected diagnosis and four tool calls.
-- The evidence trail displays actual tool record counts from the completed report.
-- Selecting Metrics filters the evidence table to five records; All evidence restores nine.
-- Selecting citation L1 highlights its source record in the evidence table.
-- Arrow-key navigation changes the selected tab and moves focus.
-- An unmatched search displays an empty state; clearing it restores the ledger.
-- Ollama-unavailable errors clear the previous result and disable export.
-- The evidence canvas is visible and correctly framed on desktop and mobile.
-- At 390px and 320px, page content width equals viewport width.
-- Reduced-motion preferences disable CSS transitions and canvas flow animation.
-- All 21 Python tests pass, including the newly bundled icon asset route.
+- Case cards navigate to individual investigation routes.
+- Search, pinned-case filters, and grid/list controls respond to interaction.
+- Checkout investigation produces the evidence-backed diagnosis and four tool calls.
+- Setting a two-call budget produces an incomplete report with an honest 2 / 2 count.
+- Citations navigate to evidence; cited-only filtering returns three records.
+- Evidence and runbook drawers display actual records and rule conditions.
+- Comparison selects a second synthetic snapshot without inventing a diagnosis.
+- The evaluation lab reruns all 12 offline cases and displays measured results.
+- Settings explicitly report the unavailable local Ollama service.
+- History retains runs; notes and pins survive page reloads.
+- At 390px and 320px, the investigation and evidence pages have no horizontal page overflow.
+- Desktop and mobile screenshots capture actual browser-rendered pages.
+- All 26 Python tests pass, including live evaluation and custom-budget endpoints.
 
-The diagram shows a recorded tool trace once results arrive. It does not imply that the synchronous API streams tool execution.
-
-Desktop and mobile images in this folder show browser captures of the redesigned application.
+The trail depicts a recorded trace after the synchronous API completes, not live streamed execution. Browser storage is device-specific and can be cleared by browser settings. Offline scores are public development-fixture results, not LLM or production performance.

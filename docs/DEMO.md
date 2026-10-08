@@ -2,11 +2,11 @@
 
 Start the app with `python -m sherlog serve`, then open http://127.0.0.1:8765.
 
-1. **0-20 seconds:** Select `checkout-pool` and investigate. Explain the alert and show the evidence-backed leading hypothesis.
-2. **20-40 seconds:** Open Evidence. Point to the database timeout and utilization rising from 35% to 99%. Open Tool trace to show the four calls and retrieved runbook query.
+1. **0-20 seconds:** Search the case room, pin a case, and open `checkout-pool`. Investigate and show the evidence-backed leading hypothesis.
+2. **20-40 seconds:** Follow citation L1 into the evidence vault and inspect its raw observation. Return and compare pool utilization with another incident. Show the four-call tool trace.
 3. **40-60 seconds:** Select `timeout-decoy` and investigate. The same database timeout with normal pool utilization produces an inconclusive result.
 4. **60-75 seconds:** Select `ambiguous`. Show that two mechanisms have support and neither is declared the root cause.
-5. **75-90 seconds:** Export JSON. Show the evaluation results: 12 synthetic regression cases, compared with a log-only baseline, and explain that these are development fixtures.
+5. **75-90 seconds:** Open the evaluation lab and run the offline suite. Show 12 synthetic regression cases versus the log-only baseline, explain the development-fixture limitation, and finish with saved run history.
 
 For a model demo, start Ollama, pull your configured model, and select the Ollama mode. Run `python -m evals.run --mode ollama` before quoting its results. Keep the model name, hardware, and measured results with the recording.
 

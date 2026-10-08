@@ -13,7 +13,8 @@ dependencies = ["langgraph>=1.0,<2"]
 sherlog = "sherlog.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["sherlog*"]
+include = ["sherlog*", "evals*"]
 
 [tool.setuptools.package-data]
 sherlog = ["data/*.json", "web/*"]
+evals = ["cases.json"]

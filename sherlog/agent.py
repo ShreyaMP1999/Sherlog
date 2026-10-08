@@ -69,5 +69,6 @@ def investigate(incident_id: str, mode: str = "offline", budget: int = 6,
         "mode": mode, "budget": budget, "observations": {}, "trace": []},
         config={"recursion_limit": 2 * budget + 5})
     report = result["report"]
+    report["budget"] = budget
     report["duration_ms"] = round((time.perf_counter() - started) * 1000, 2)
     return report

@@ -22,7 +22,17 @@ python -m pip install --no-deps -e .
 python -m sherlog serve
 ```
 
-Open **http://127.0.0.1:8765**, select a case from the ledger, and click **Investigate**. The evidence trail connects the alert, four evidence sources, and the finding. Click a tool to filter its evidence, or a report citation to highlight its source record. Transitions respect reduced-motion preferences; the completed trail is explicitly labeled as a recorded trace.
+Open **http://127.0.0.1:8765**, open a case card, and click **Investigate**. Dedicated routes provide a case room, investigation workspace, evidence vault, runbook library, evaluation lab, and run history.
+
+- Search, filter, pin, and switch between grid and list views of case files.
+- Follow the animated evidence trail, inspect raw observations in a drawer, and compare two incident snapshots.
+- Save case notes and export investigation runs. Notes, pins, and up to 50 runs are stored locally in your browser, not synced to a server.
+- Browse runbook conditions and suggested actions; rerun the real offline evaluation in the lab.
+- Check Ollama readiness and adjust the tool-call budget in workspace settings.
+
+Subtle teal, coral, blue, and golden accents distinguish casework. Reduced-motion preferences are respected; the completed trail depicts a recorded trace, not streamed execution.
+
+![Investigation workspace](docs/demo-investigation.jpg)
 
 For Windows, create the environment with `py -3 -m venv .venv`, then activate it with `.venv\Scripts\Activate.ps1`; the remaining `python` commands are the same. If activation is restricted, run them using `.venv\Scripts\python.exe` directly.
 
@@ -80,7 +90,7 @@ python -m sherlog investigate checkout-pool --mode ollama
 python -m evals.run --mode ollama --output artifacts/ollama-eval.json
 ```
 
-Choose **Local LLM / Ollama** in the browser after the model is available. Configure `SHERLOG_MODEL` and `OLLAMA_HOST` for a different model or endpoint. Missing models or unavailable Ollama produce an explicit error; there is no silent switch to offline mode.
+Choose **Local LLM / Ollama** after the model is available. Workspace settings distinguish an unreachable service from a missing model. Configure `SHERLOG_MODEL` and `OLLAMA_HOST` before starting the server for a different model or endpoint. Failures remain explicit; there is no silent switch to offline mode.
 
 The Ollama request/response contract is unit tested with a mocked transport. A live model run was **not** performed in the build environment, where Ollama is absent. Run the command above to measure your chosen model; the offline scores below do not measure LLM reasoning or prompt-injection resistance.
 
@@ -103,7 +113,7 @@ Recorded local results on Python 3.13:
 | Tool budget compliance | 100% | Not applicable |
 | Mean tool calls | 4 | No tool loop |
 
-**21 tests pass.** They cover counterfactual metric changes, uncertain outcomes, timeouts, duplicate calls, malformed plans, fabricated citations, API validation, and server routes. The [recorded evaluation](docs/eval-results.json) contains every case and measured local timings.
+**26 tests pass.** They cover counterfactual metric changes, uncertain outcomes, timeouts, duplicate calls, malformed plans, fabricated citations, API validation, live evaluation, model readiness, custom budgets, and server routes. The [recorded evaluation](docs/eval-results.json) contains every case and measured local timings.
 
 **Interpretation:** these are 12 public, hand-authored synthetic regression fixtures, including decoys, a stale deployment, conflicting signals, and an untrusted log instruction. They are development examples, not a held-out benchmark. The diagnostic rules were built for these failure categories. Citation validity checks reference existence, not semantic entailment. No production accuracy, calibrated confidence, MTTR reduction, or live-model performance is claimed.
 
@@ -128,7 +138,7 @@ docs/            Demo, results, architecture and interview preparation
 
 ## Development History
 
-The initial repository was delivered in seven meaningful stages: package foundation; telemetry tools; LangGraph investigation; CLI and evaluation; Sherlog rename/tests/CI; browser demo; documentation and reproducible examples. Earlier stages use the working title TracePilot. A subsequent interface redesign adds the case ledger, interactive evidence trail, citation navigation, and refreshed screenshots.
+The initial repository was delivered in seven meaningful stages: package foundation; telemetry tools; LangGraph investigation; CLI and evaluation; Sherlog rename/tests/CI; browser demo; documentation and reproducible examples. Earlier stages use the working title TracePilot. Subsequent interface commits introduce the evidence trail and then a multipage workspace with persistent casework, comparisons, live evaluation, and model readiness checks.
 
 See [engineering decisions and interview preparation](docs/ENGINEERING.md) for tradeoffs and practical exercises. Next steps: held-out incidents, a real telemetry adapter with time-window filtering, tracing, and measured model comparisons.
 
