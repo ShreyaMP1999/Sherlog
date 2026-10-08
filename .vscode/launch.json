@@ -1,0 +1,9 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {"name": "Sherlog: Browser Demo", "type": "debugpy", "request": "launch",
+     "module": "sherlog", "args": ["serve"], "console": "integratedTerminal"},
+    {"name": "Sherlog: Investigate Checkout", "type": "debugpy", "request": "launch",
+     "module": "sherlog", "args": ["investigate", "checkout-pool"], "console": "integratedTerminal"}
+  ]
+}
