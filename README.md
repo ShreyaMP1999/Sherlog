@@ -22,7 +22,9 @@ python -m pip install --no-deps -e .
 python -m sherlog serve
 ```
 
-Open **http://127.0.0.1:8765**, select an incident, and click **Investigate**. For Windows, create the environment with `py -3 -m venv .venv`, then activate it with `.venv\Scripts\Activate.ps1`; the remaining `python` commands are the same. If activation is restricted, run them using `.venv\Scripts\python.exe` directly.
+Open **http://127.0.0.1:8765**, select a case from the ledger, and click **Investigate**. The evidence trail connects the alert, four evidence sources, and the finding. Click a tool to filter its evidence, or a report citation to highlight its source record. Transitions respect reduced-motion preferences; the completed trail is explicitly labeled as a recorded trace.
+
+For Windows, create the environment with `py -3 -m venv .venv`, then activate it with `.venv\Scripts\Activate.ps1`; the remaining `python` commands are the same. If activation is restricted, run them using `.venv\Scripts\python.exe` directly.
 
 From an extracted ZIP, open the `Sherlog` folder in VS Code and follow the same setup from `python3 -m venv .venv`. Convenience launchers: `bash run_demo.sh` on macOS/Linux or `run_demo.cmd` on Windows.
 
@@ -118,7 +120,7 @@ sherlog/
   cli.py         Terminal entry point
   server.py      Local browser API
   data/          Synthetic observations and runbooks
-  web/           Dependency-free browser interface
+  web/           Static browser interface and vendored Lucide icons
 evals/           Labeled regression cases and baseline comparison
 tests/           Agent and HTTP integration tests
 docs/            Demo, results, architecture and interview preparation
@@ -126,7 +128,7 @@ docs/            Demo, results, architecture and interview preparation
 
 ## Development History
 
-The repository is delivered in seven meaningful stages: package foundation; telemetry tools; LangGraph investigation; CLI and evaluation; Sherlog rename/tests/CI; browser demo; documentation and reproducible examples. Earlier stages use the working title TracePilot.
+The initial repository was delivered in seven meaningful stages: package foundation; telemetry tools; LangGraph investigation; CLI and evaluation; Sherlog rename/tests/CI; browser demo; documentation and reproducible examples. Earlier stages use the working title TracePilot. A subsequent interface redesign adds the case ledger, interactive evidence trail, citation navigation, and refreshed screenshots.
 
 See [engineering decisions and interview preparation](docs/ENGINEERING.md) for tradeoffs and practical exercises. Next steps: held-out incidents, a real telemetry adapter with time-window filtering, tracing, and measured model comparisons.
 

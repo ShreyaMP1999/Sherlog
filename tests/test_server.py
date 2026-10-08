@@ -28,7 +28,7 @@ class ServerTests(unittest.TestCase):
         return request.urlopen(req)
 
     def test_health_and_static_assets(self):
-        for path in ("/health", "/", "/app.js", "/style.css"):
+        for path in ("/health", "/", "/app.js", "/style.css", "/lucide.min.js"):
             with request.urlopen(self.base + path) as response:
                 self.assertEqual(response.status, 200)
                 self.assertGreater(len(response.read()), 10)

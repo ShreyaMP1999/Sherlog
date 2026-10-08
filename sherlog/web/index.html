@@ -1,38 +1,40 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sherlog | Incident Investigation</title><link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
-</head>
-<body>
-  <header><div class="brand">Sherlog<span class="brand-dot"></span></div><span class="workspace">Incident investigation</span><span class="environment">Synthetic workspace</span></header>
-  <div class="layout">
-    <aside><div class="aside-title"><h1>Incidents</h1><span id="case-count">12</span></div>
-      <label class="search-label" for="search">Search incidents</label><input id="search" type="search" placeholder="Search incidents">
-      <nav id="incidents" aria-label="Incident list"></nav>
-      <footer>Read-only telemetry<span>Local workspace</span></footer>
-    </aside>
-    <main>
-      <div class="breadcrumbs">WORKSPACE / CHECKOUT</div>
-      <div class="title-row"><div><h2 id="title">Loading incidents</h2><p id="alert"></p></div><span class="service">checkout</span></div>
-      <div class="controls"><div><label for="mode">Investigation mode</label><select id="mode"><option value="offline">Offline baseline</option><option value="ollama">Local LLM / Ollama</option></select></div><button id="investigate" class="primary">Investigate</button><button id="export" disabled>Export JSON</button></div>
-      <p id="error" role="alert" hidden></p><div id="loading" role="status" hidden>Investigating incident...</div>
-      <section id="empty"><h3>Investigation pending</h3><p id="empty-alert">Select an incident.</p></section>
-      <div id="result" hidden>
-        <div class="stats"><div><span>OUTCOME</span><strong id="outcome"></strong></div><div><span>EVIDENCE SUPPORT</span><strong id="support"></strong></div><div><span>TOOL CALLS</span><strong id="calls"></strong></div><div><span>ELAPSED</span><strong id="elapsed"></strong></div></div>
-        <div class="tabs" role="tablist" aria-label="Investigation views"><button role="tab" id="tab-report" aria-controls="report-panel" aria-selected="true" data-tab="report">Report</button><button role="tab" id="tab-evidence" aria-controls="evidence-panel" aria-selected="false" data-tab="evidence">Evidence</button><button role="tab" id="tab-trace" aria-controls="trace-panel" aria-selected="false" data-tab="trace">Tool trace</button></div>
-        <section id="report-panel" role="tabpanel" aria-labelledby="tab-report">
-          <div class="report-heading"><span class="eyebrow">INVESTIGATION REPORT</span><span id="cause" class="cause"></span></div>
-          <h3 id="summary"></h3><div id="citations" class="citations"></div>
-          <h4>Signal comparison</h4><div id="metrics" class="metrics"></div>
-          <h4>Suggested next steps</h4><ol id="actions"></ol><div id="candidates"></div>
-          <p id="limitations" class="limitations"></p>
-        </section>
-        <section id="evidence-panel" role="tabpanel" aria-labelledby="tab-evidence" hidden><h3>Collected evidence</h3><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Source</th><th>Observation</th></tr></thead><tbody id="evidence"></tbody></table></div></section>
-        <section id="trace-panel" role="tabpanel" aria-labelledby="tab-trace" hidden><h3>Investigation trajectory</h3><ol id="trace"></ol></section>
-      </div>
-    </main>
-  </div>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sherlog | Follow the Evidence</title><link rel="stylesheet" href="/style.css">
+<script src="/lucide.min.js" defer></script><script src="/app.js" defer></script>
+</head><body>
+<header class="masthead"><a class="brand" href="/" aria-label="Sherlog home"><i data-lucide="scan-line"></i>Sherlog<span>.</span></a><div class="masthead-rule"></div><span class="masthead-caption">THE INCIDENT BUREAU</span><span class="environment"><b></b>SYNTHETIC / LOCAL</span></header>
+<div class="layout"><aside>
+<div class="aside-title"><h1>Case ledger</h1><span id="case-count">12</span></div>
+<div class="search"><i data-lucide="search"></i><label class="sr-only" for="search">Search incidents</label><input id="search" type="search" placeholder="Find a case"></div>
+<nav id="incidents" aria-label="Incident list"></nav><footer><i data-lucide="shield-check"></i><div>READ-ONLY OPERATIONS<span>No production writes</span></div></footer>
+</aside><main>
+<div class="case-meta"><span id="case-number">CASE FILE / 001</span><span>CHECKOUT SERVICE</span><span id="case-state">OPEN INVESTIGATION</span></div>
+<div class="title-row"><h2 id="title">Loading case ledger</h2><span class="case-glyph" aria-hidden="true">?</span></div><p id="alert" class="alert-copy"></p>
+<div class="controls"><div class="mode-control"><i data-lucide="workflow"></i><label class="sr-only" for="mode">Investigation mode</label><select id="mode"><option value="offline">Offline baseline</option><option value="ollama">Local LLM / Ollama</option></select></div><button id="investigate" class="primary"><span>Investigate</span><i data-lucide="arrow-up-right"></i></button><button id="export" class="icon-button" disabled title="Export JSON report" aria-label="Export JSON"><i data-lucide="download"></i></button></div>
+<p id="error" role="alert" hidden></p><div id="loading" class="sr-only" role="status" hidden>Investigating incident...</div>
+<section class="trail-section" aria-label="Evidence trail">
+<div class="section-line"><h3>Evidence trail</h3><span id="trail-state">AWAITING OBSERVATIONS</span></div>
+<div id="trail-map" class="trail-map"><canvas id="trail-canvas" aria-hidden="true"></canvas>
+<div id="trail-alert" class="trail-origin"><span class="map-kicker">01 / SIGNAL</span><i data-lucide="radio"></i><strong>Checkout alert</strong><span id="signal-label">checkout-pool</span></div>
+<div class="trail-tools">
+<button class="trail-tool" data-source="search_logs" title="Inspect log evidence"><i data-lucide="align-left"></i><strong>Logs</strong><span class="tool-count">--</span></button>
+<button class="trail-tool" data-source="inspect_metrics" title="Inspect metric evidence"><i data-lucide="activity"></i><strong>Metrics</strong><span class="tool-count">--</span></button>
+<button class="trail-tool" data-source="deployment_history" title="Inspect deployment evidence"><i data-lucide="git-branch"></i><strong>Deployments</strong><span class="tool-count">--</span></button>
+<button class="trail-tool" data-source="search_runbooks" title="Inspect runbook evidence"><i data-lucide="book-open"></i><strong>Runbooks</strong><span class="tool-count">--</span></button>
+</div>
+<button id="trail-verdict" class="trail-verdict" title="Open investigation report"><span class="map-kicker">03 / FINDING</span><i data-lucide="fingerprint"></i><strong id="verdict-label">Undetermined</strong><span id="verdict-detail">Evidence pending</span></button></div>
+<div class="trail-legend"><span><b class="legend-before"></b>Alert</span><span><b class="legend-after"></b>Collected evidence</span><span class="trail-footnote">02 / CORROBORATION</span></div>
+</section>
+<section id="empty" class="pending"><span class="pending-mark">[ ? ]</span><div><h3>Case unresolved.</h3><p id="empty-alert">Select an incident.</p></div><span id="pending-number" class="pending-number" aria-hidden="true">001</span></section>
+<div id="result" hidden>
+<div class="stats"><div><span>OUTCOME</span><strong id="outcome"></strong></div><div><span>SUPPORT</span><strong id="support"></strong></div><div><span>TOOL CALLS</span><strong id="calls"></strong></div><div><span>ELAPSED</span><strong id="elapsed"></strong></div></div>
+<div class="tabs" role="tablist" aria-label="Investigation views"><button role="tab" id="tab-report" aria-controls="report-panel" aria-selected="true" data-tab="report"><span>01</span> Report</button><button role="tab" id="tab-evidence" aria-controls="evidence-panel" aria-selected="false" data-tab="evidence"><span>02</span> Evidence</button><button role="tab" id="tab-trace" aria-controls="trace-panel" aria-selected="false" data-tab="trace"><span>03</span> Tool trace</button></div>
+<section id="report-panel" role="tabpanel" aria-labelledby="tab-report"><div class="report-heading"><span class="eyebrow">THE FINDING</span><span id="cause" class="cause"></span></div><h3 id="summary"></h3><div id="citations" class="citations"></div>
+<div class="section-line signal-heading"><h4>Signal comparison</h4><div class="signal-legend"><span>BEFORE</span><span>AFTER</span></div></div><div id="metrics" class="metrics"></div>
+<h4 class="actions-heading">Next moves</h4><ol id="actions"></ol><div id="candidates"></div><p id="limitations" class="limitations"></p></section>
+<section id="evidence-panel" role="tabpanel" aria-labelledby="tab-evidence" hidden><div class="section-line"><h3>Collected evidence</h3><button id="clear-filter" hidden>All evidence</button></div><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Source</th><th>Observation</th></tr></thead><tbody id="evidence"></tbody></table></div></section>
+<section id="trace-panel" role="tabpanel" aria-labelledby="tab-trace" hidden><h3>Investigation trajectory</h3><ol id="trace"></ol></section>
+</div><div class="page-end"><span>SHERLOG / FOLLOW THE EVIDENCE</span><span>LOCAL CASEWORK</span></div>
+</main></div></body></html>

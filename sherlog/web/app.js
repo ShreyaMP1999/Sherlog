@@ -2,6 +2,8 @@
 let incidents = [], selected = null, report = null;
 const $ = id => document.getElementById(id);
 const titleCase = value => value.replaceAll("_", " ");
+let trailFrame = null, flowUntil = 0, evidenceSource = null;
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 function node(tag, text, className) {
   const element = document.createElement(tag);
   if (text !== undefined) element.textContent = text;
@@ -22,22 +24,37 @@ function renderList() {
   for (const incident of incidents.filter(item => (item.title + item.id).toLowerCase().includes(query))) {
     const button = node("button", undefined, "incident");
     button.setAttribute("aria-current", String(selected?.id === incident.id));
-    button.append(node("span", incident.id), node("strong", incident.title));
+    const serial = String(incidents.indexOf(incident) + 1).padStart(2, "0");
+    const copy = node("div", undefined, "incident-copy");
+    copy.append(node("small", incident.id), node("strong", incident.title));
+    const arrow = node("i", undefined, "incident-arrow"); arrow.dataset.lucide = "arrow-up-right";
+    button.append(node("span", serial, "incident-number"), copy, arrow);
     button.addEventListener("click", () => select(incident));
     $("incidents").append(button);
   }
+  if (!$("incidents").children.length) $("incidents").append(node("p", "No matching cases.", "no-matches"));
+  lucide.createIcons();
 }
 function select(incident) {
   selected = incident; report = null;
+  evidenceSource = null;
+  const serial = String(incidents.indexOf(incident) + 1).padStart(3, "0");
+  $("case-number").textContent = "CASE FILE / " + serial;
+  $("pending-number").textContent = serial;
+  $("case-state").textContent = "OPEN INVESTIGATION";
+  $("signal-label").textContent = incident.id;
   $("title").textContent = incident.title;
   $("alert").textContent = incident.alert;
   $("empty-alert").textContent = incident.alert;
   $("result").hidden = true; $("empty").hidden = false;
   $("export").disabled = true; $("error").hidden = true;
   renderList();
+  updateTrail();
 }
 function renderReport(value) {
   report = value;
+  evidenceSource = null;
+  $("case-state").textContent = report.status.toUpperCase();
   $("empty").hidden = true; $("result").hidden = false;
   $("outcome").textContent = report.status;
   $("support").textContent = report.support;
@@ -46,7 +63,18 @@ function renderReport(value) {
   $("cause").textContent = titleCase(report.cause);
   $("summary").textContent = report.summary;
   $("limitations").textContent = report.limitations;
-  $("citations").replaceChildren(...report.citations.map(ref => node("span", ref, "citation")));
+  $("citations").replaceChildren(...report.citations.map(ref => {
+    const button = node("button", ref, "citation");
+    button.title = "Open evidence " + ref;
+    button.addEventListener("click", () => {
+      evidenceSource = null; renderEvidence(); showTab("evidence");
+      const row = [...$("evidence").children].find(item => item.dataset.reference === ref);
+      row?.classList.add("is-cited");
+      row?.scrollIntoView({behavior: reducedMotion.matches ? "instant" : "smooth", block: "nearest"});
+      $("tab-evidence").focus();
+    });
+    return button;
+  }));
   $("actions").replaceChildren(...report.actions.map(action => node("li", action)));
   $("candidates").textContent = report.candidates.length > 1 ? "Supported hypotheses: " + report.candidates.map(item => item.title).join("; ") : "";
   $("metrics").replaceChildren();
@@ -56,17 +84,12 @@ function renderReport(value) {
     const track = node("div", undefined, "metric-track");
     const scale = row.name.endsWith("_pct") ? 100 : Math.max(row.before, row.after, 5000);
     const after = node("div", undefined, "metric-bar"), before = node("div", undefined, "metric-before");
+    if (row.after > row.before * 1.5 && row.after > 5) after.style.backgroundColor = "#c96d59";
     after.style.width = Math.min(100, row.after / scale * 100) + "%";
     before.style.width = Math.min(100, row.before / scale * 100) + "%";
     track.append(after, before); metric.append(top, track); $("metrics").append(metric);
   }
-  $("evidence").replaceChildren();
-  for (const row of report.evidence) {
-    const tr = node("tr");
-    const observation = row.message ?? row.description ?? row.title ?? `${row.name}: ${row.before} → ${row.after}`;
-    tr.append(node("td", row.id), node("td", titleCase(row.source)), node("td", observation));
-    $("evidence").append(tr);
-  }
+  renderEvidence();
   $("trace").replaceChildren();
   for (const [index, step] of report.trace.entries()) {
     const li = node("li");
@@ -76,7 +99,79 @@ function renderReport(value) {
     $("trace").append(li);
   }
   $("export").disabled = false; showTab("report");
+  updateTrail();
 }
+function renderEvidence() {
+  $("evidence").replaceChildren();
+  $("clear-filter").hidden = !evidenceSource;
+  for (const row of report.evidence.filter(row => !evidenceSource || row.source === evidenceSource)) {
+    const tr = node("tr");
+    tr.dataset.reference = row.id;
+    const observation = row.message ?? row.description ?? row.title ?? `${row.name}: ${row.before} → ${row.after}`;
+    tr.append(node("td", row.id), node("td", titleCase(row.source)), node("td", observation));
+    $("evidence").append(tr);
+  }
+  if (!$("evidence").children.length) {
+    const td = node("td", "No records returned by this tool."); td.colSpan = 3;
+    const tr = node("tr"); tr.append(td); $("evidence").append(tr);
+  }
+}
+function updateTrail() {
+  $("trail-map").dataset.ready = String(Boolean(report));
+  $("trail-state").textContent = report ? "RECORDED TOOL TRACE" : "AWAITING OBSERVATIONS";
+  $("verdict-label").textContent = report ? titleCase(report.cause) : "Undetermined";
+  $("verdict-detail").textContent = report ? report.support + " evidence" : "Evidence pending";
+  $("trail-verdict").dataset.state = report?.status ?? "pending";
+  $("trail-verdict").disabled = !report;
+  for (const button of document.querySelectorAll(".trail-tool")) {
+    const steps = report?.trace.filter(step => step.tool === button.dataset.source) ?? [];
+    const step = steps.find(item => item.ok) ?? steps.at(-1);
+    button.dataset.state = step ? (step.ok ? "complete" : "failed") : "pending";
+    button.querySelector(".tool-count").textContent = step ? String(step.records) : "--";
+    button.disabled = !step;
+  }
+  flowUntil = report ? performance.now() + 1600 : 0;
+  scheduleTrail();
+}
+function scheduleTrail() {
+  cancelAnimationFrame(trailFrame);
+  trailFrame = requestAnimationFrame(drawTrail);
+}
+function drawTrail(now) {
+  const map = $("trail-map"), canvas = $("trail-canvas"), bounds = map.getBoundingClientRect();
+  const ratio = Math.min(devicePixelRatio || 1, 2), ctx = canvas.getContext("2d");
+  const width = Math.round(bounds.width * ratio), height = Math.round(bounds.height * ratio);
+  if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0); ctx.clearRect(0, 0, bounds.width, bounds.height);
+  const point = (element, right) => { const rect = element.getBoundingClientRect(); return {
+    x: (right ? rect.right : rect.left) - bounds.left, y: rect.top + rect.height / 2 - bounds.top}; };
+  const start = point($("trail-alert"), true), end = point($("trail-verdict"), false);
+  const moving = !reducedMotion.matches && (document.body.classList.contains("is-investigating") || now < flowUntil);
+  ctx.lineWidth = 1; ctx.lineDashOffset = moving ? -now / 45 : 0;
+  for (const button of document.querySelectorAll(".trail-tool")) {
+    const left = point(button, false), right = point(button, true);
+    ctx.strokeStyle = button.dataset.state === "complete" ? "#8ba867" : button.dataset.state === "failed" ? "#ba504b" : "#c5cdb8";
+    ctx.setLineDash(moving ? [3, 5] : []);
+    for (const [a, b] of [[start, left], [right, end]]) {
+      const middle = (a.x + b.x) / 2;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.bezierCurveTo(middle, a.y, middle, b.y, b.x, b.y); ctx.stroke();
+    }
+  }
+  if (moving) trailFrame = requestAnimationFrame(drawTrail);
+}
+for (const button of document.querySelectorAll(".trail-tool")) {
+  button.addEventListener("click", () => {
+    if (!report) return;
+    evidenceSource = button.dataset.source; renderEvidence(); showTab("evidence");
+    $("tab-evidence").focus();
+    $("evidence-panel").scrollIntoView({behavior: reducedMotion.matches ? "instant" : "smooth", block: "nearest"});
+  });
+}
+$("clear-filter").addEventListener("click", () => { evidenceSource = null; renderEvidence(); });
+$("trail-verdict").addEventListener("click", () => { if (report) { showTab("report"); $("tab-report").focus(); } });
+new ResizeObserver(scheduleTrail).observe($("trail-map"));
+reducedMotion.addEventListener("change", scheduleTrail);
+lucide.createIcons();
 $("search").addEventListener("input", renderList);
 for (const tab of document.querySelectorAll("[data-tab]")) {
   tab.addEventListener("click", () => showTab(tab.dataset.tab));
@@ -93,9 +188,14 @@ for (const tab of document.querySelectorAll("[data-tab]")) {
 $("investigate").addEventListener("click", async () => {
   if (!selected) return;
   const incidentId = selected.id;
+  report = null; evidenceSource = null; updateTrail();
   $("investigate").disabled = true; $("mode").disabled = true;
   $("loading").hidden = false; $("error").hidden = true;
   $("result").hidden = true; $("empty").hidden = true; $("export").disabled = true;
+  document.body.classList.add("is-investigating");
+  $("case-state").textContent = "COLLECTING EVIDENCE";
+  $("trail-state").textContent = "COLLECTING OBSERVATIONS";
+  scheduleTrail();
   try {
     const response = await fetch("/api/investigate", {method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify({incident: incidentId, mode: $("mode").value})});
@@ -109,6 +209,8 @@ $("investigate").addEventListener("click", async () => {
     }
   } finally {
     $("loading").hidden = true; $("investigate").disabled = false; $("mode").disabled = false;
+    document.body.classList.remove("is-investigating");
+    if (!report) { $("case-state").textContent = "OPEN INVESTIGATION"; updateTrail(); }
   }
 });
 $("export").addEventListener("click", () => {

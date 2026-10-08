@@ -33,6 +33,7 @@ class Handler(BaseHTTPRequestHandler):
                                    for row in load_incidents()])
         files = {"/": ("index.html", "text/html; charset=utf-8"),
                  "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+                 "/lucide.min.js": ("lucide.min.js", "text/javascript; charset=utf-8"),
                  "/style.css": ("style.css", "text/css; charset=utf-8")}
         if path in files:
             name, kind = files[path]
