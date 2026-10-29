@@ -104,6 +104,23 @@ class AgentTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Ollama planning failed"):
                 OllamaPlanner()({"alert": "Investigate", "observations": {}, "trace": [], "budget": 6})
 
+    def test_malformed_ollama_responses_are_explicit_failures(self):
+        import json
+        from io import BytesIO
+        responses = [None, [], {}, {"message": None}, {"message": {"content": None}},
+                     {"message": {"content": "not json"}},
+                     {"message": {"content": "null"}},
+                     {"message": {"content": json.dumps({
+                         "tool": "shell", "arguments": {}, "reason": "Invalid tool"})}}]
+        state = {"alert": "Investigate", "observations": {}, "trace": [], "budget": 6}
+        for payload in responses:
+            with self.subTest(payload=payload), patch(
+                "sherlog.planner.request.urlopen",
+                return_value=BytesIO(json.dumps(payload).encode())
+            ):
+                with self.assertRaisesRegex(RuntimeError, "Ollama planning failed"):
+                    OllamaPlanner()(state)
+
 
 if __name__ == "__main__":
     unittest.main()

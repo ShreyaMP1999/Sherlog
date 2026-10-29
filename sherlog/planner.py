@@ -52,8 +52,10 @@ class OllamaPlanner:
         try:
             with request.urlopen(req, timeout=60) as response:
                 result = json.load(response)
-            return json.loads(result["message"]["content"])
-        except (URLError, TimeoutError, KeyError, ValueError) as exc:
+            decision = json.loads(result["message"]["content"])
+            validate_plan(decision)
+            return decision
+        except (URLError, TimeoutError, KeyError, TypeError, ValueError) as exc:
             raise RuntimeError("Ollama planning failed. Start Ollama, pull the configured model, "
                                "or run with --mode offline.") from exc
 
