@@ -75,7 +75,7 @@ class AgentTests(unittest.TestCase):
                 validate_plan(plan)
 
     def test_invalid_budget_and_incident_rejected(self):
-        for budget in [0, 13]:
+        for budget in [0, 13, True, False, 1.5, "6", None]:
             with self.assertRaises(ValueError):
                 investigate("checkout-pool", budget=budget)
         with self.assertRaises(ValueError):

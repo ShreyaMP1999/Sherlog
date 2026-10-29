@@ -83,6 +83,14 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(report["budget"], 2)
         self.assertLessEqual(report["tool_calls"], 2)
 
+    def test_boolean_budget_returns_400(self):
+        for budget in (True, False):
+            with self.subTest(budget=budget), self.assertRaises(HTTPError) as error:
+                self.post({"incident": "checkout-pool", "budget": budget})
+            self.assertEqual(error.exception.code, 400)
+            self.assertIn("Tool budget", json.load(error.exception)["error"])
+            error.exception.close()
+
     def test_model_status_ready_and_missing(self):
         # Call the handler directly so the mocked transport cannot intercept the test client.
         handler = object.__new__(Handler)

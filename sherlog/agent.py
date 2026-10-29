@@ -25,7 +25,7 @@ def investigate(incident_id: str, mode: str = "offline", budget: int = 6,
                 *, planner=None, tools=None) -> dict:
     if mode not in ("offline", "ollama"):
         raise ValueError("Mode must be offline or ollama")
-    if not isinstance(budget, int) or not 1 <= budget <= 12:
+    if isinstance(budget, bool) or not isinstance(budget, int) or not 1 <= budget <= 12:
         raise ValueError("Tool budget must be between 1 and 12")
     incident = get_incident(incident_id)
     tools = tools or IncidentTools(incident)
