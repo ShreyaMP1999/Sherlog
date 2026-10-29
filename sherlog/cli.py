@@ -33,8 +33,11 @@ def main():
             parser.exit(2, f"Sherlog: {exc}\n")
         content = json.dumps(report, indent=2) if args.format == "json" else markdown(report)
         if args.output:
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(content + "\n")
+            try:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
+                args.output.write_text(content + "\n", encoding="utf-8")
+            except OSError as exc:
+                parser.exit(2, f"Sherlog: Cannot write report to {args.output}: {exc}\n")
         print(content)
 
 
