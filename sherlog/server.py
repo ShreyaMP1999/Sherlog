@@ -47,7 +47,11 @@ class Handler(BaseHTTPRequestHandler):
                 with request.urlopen(host + "/api/tags", timeout=2) as response:
                     payload = json.load(response)
                 models = [row["name"] for row in payload.get("models", [])]
-                return self.send(200, {"status": "ready" if model in models else "model_missing",
+                # Ollama lists untagged model names with an explicit :latest tag.
+                model_name = model if ":" in model.rsplit("/", 1)[-1] else model + ":latest"
+                installed = {name if ":" in name.rsplit("/", 1)[-1] else name + ":latest"
+                             for name in models}
+                return self.send(200, {"status": "ready" if model_name in installed else "model_missing",
                                        "model": model, "endpoint": host, "models": models})
             except (URLError, TimeoutError, ValueError, KeyError, TypeError, AttributeError):
                 return self.send(200, {"status": "unavailable", "model": model,

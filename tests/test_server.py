@@ -112,3 +112,23 @@ class ServerTests(unittest.TestCase):
             request.urlopen(req)
         self.assertEqual(error.exception.code, 403)
         error.exception.close()
+
+    def test_model_status_recognizes_default_tags(self):
+        handler = object.__new__(Handler)
+        handler.path = "/api/model-status"
+        captured = []
+        handler.send = lambda status, payload: captured.append(payload)
+        for configured, installed, expected in (
+            ("qwen3", "qwen3:latest", "ready"),
+            ("qwen3:latest", "qwen3", "ready"),
+            ("qwen3", "qwen3:4b", "model_missing"),
+            ("localhost:5000/team/qwen3", "localhost:5000/team/qwen3:latest", "ready"),
+        ):
+            with self.subTest(model=configured, installed=installed), patch.dict(
+                "os.environ", {"SHERLOG_MODEL": configured}
+            ), patch("sherlog.server.request.urlopen", return_value=io.BytesIO(
+                json.dumps({"models": [{"name": installed}]}).encode())
+            ):
+                handler.do_GET()
+            self.assertEqual(captured[-1]["status"], expected)
+            self.assertEqual(captured[-1]["model"], configured)
